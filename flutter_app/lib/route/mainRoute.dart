@@ -1,39 +1,26 @@
 import 'package:flutter/material.dart';
 
-class Home2 extends StatefulWidget{
+class MainRoute extends StatefulWidget{
 
-  Home2({Key key}): super(key: key);
+  MainRoute({Key key}): super(key: key);
 
   @override
-  _Home2State createState() => _Home2State();
+  _MainRouteState createState() => _MainRouteState();
 
 }
 
-class _Home2State extends State<Home2>{
+class _MainRouteState extends State<MainRoute>{
   int _selectedIndex = 0;
   static const TextStyle btmNavTextStyle = TextStyle(fontSize: 30, fontWeight: FontWeight.bold);
-
-  void _onItemSelected(int index){
-    setState(() {
-      _selectedIndex =  index;
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.red.shade600,
-        title: Text('Flutter App')
-      ),
-      body : Container(
+  final List<Widget> _widgetPage = <Widget>[
+    Container(
         margin: EdgeInsets.only(top: 8, right: 8, left: 8),
         child: Card(
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
             children: <Widget>[
-              Container(                
+              Container(
                 padding: EdgeInsets.all(16),
                 child: Image.asset('assets/food.jpg', width: 125, height: 100,)
               ),
@@ -88,6 +75,24 @@ class _Home2State extends State<Home2>{
           )
         )
       ),
+      Text('sdf'),
+      Text('dsf')
+  ];
+
+  void _onItemSelected(int index){
+    setState(() {
+      _selectedIndex =  index;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Colors.red.shade600,
+        title: Text('Flutter App')
+      ),
+      body : _widgetPage.elementAt(_selectedIndex),
       bottomNavigationBar: BottomNavigationBar(
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(
