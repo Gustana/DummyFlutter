@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'route/detail.dart';
+import 'route/home.dart';
 
 void main() => runApp(MyApp());
 
@@ -22,8 +22,8 @@ class RegisterPage extends StatelessWidget {
   static final appName = 'Flutter App';
 
   void moveToHome(BuildContext context){
-    Navigator.push(context, MaterialPageRoute(
-      builder: (context)=> Home()
+    Navigator.pushReplacement(context, MaterialPageRoute(
+      builder: (context)=> Home2()
     ));
   }
 
