@@ -34,9 +34,15 @@ class RegisterPage extends StatefulWidget {
 
 class RegisterPageState extends State<RegisterPage>{
 
+  TextEditingController _fullNameController = new TextEditingController();
+  TextEditingController _usernameController = new TextEditingController();
+  TextEditingController _passwordController = new TextEditingController();
+
   Future<Register>  _registerUser;
 
   final appName = 'Flutter App';
+
+  static const registerURL = 'http://10.0.2.2/resto/process/auth/register/register.php';
 
   String _levelUser = 'Select Level';
   static const levelUserData = [
@@ -51,6 +57,14 @@ class RegisterPageState extends State<RegisterPage>{
 @override
   void initState() {
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    _fullNameController.dispose();
+    _passwordController.dispose();
+    _usernameController.dispose();
+    super.dispose();
   }
 
 @override
@@ -93,6 +107,7 @@ class RegisterPageState extends State<RegisterPage>{
                           child: Form(
                             key: Key('fullname'),
                             child: TextFormField(
+                              controller: _fullNameController,
                               decoration: InputDecoration(
                                 hintText: 'Full Name'
                               ),
@@ -117,6 +132,7 @@ class RegisterPageState extends State<RegisterPage>{
                           child: Form(
                             key: Key('username'),
                             child: TextFormField(
+                              controller: _usernameController,
                               decoration: InputDecoration(
                                 hintText: 'Username'
                               ),
@@ -141,6 +157,7 @@ class RegisterPageState extends State<RegisterPage>{
                           child: Form(
                             key: Key('password'),
                             child: TextFormField(
+                              controller: _passwordController,
                               obscureText: true,
                               decoration: InputDecoration(
                                 hintText: 'Password'
@@ -219,8 +236,21 @@ class RegisterPageState extends State<RegisterPage>{
                         child: RaisedButton(
                           color: Colors.blueAccent,
                           splashColor: Colors.greenAccent,
-                          onPressed: ()async{
+                          onPressed: () async{
                             //moveToHome(context);
+                            Register registerData = Register(
+                              fullName: _fullNameController.text, 
+                              userName: _usernameController.text,
+                              password: _passwordController.text,
+                              level: _levelUser
+                              );
+
+                            Register register = await ApiHelper.register(
+                              registerURL, 
+                              data: registerData.toMap()
+                            );
+
+                            
                           },
                           child: Container(
                             padding: EdgeInsets.all(12),

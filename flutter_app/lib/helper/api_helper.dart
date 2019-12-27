@@ -5,13 +5,15 @@ import 'package:http/http.dart' as http;
 import 'package:flutter_app/model/post/register.dart';
 
 class ApiHelper{
-  static Future<Register> register() async{
-    final registerResponse = await http.get('http://localhost/resto/process/auth/register/register.php');
+  
+  static Future<Register> register(String url, {Map data}) async{
+    return http.post(url, body: data).then((http.Response response){
+      final statusCode = response.statusCode;
 
-    if(registerResponse.statusCode == 200){
-      return Register.fromJson(json.decode(registerResponse.body));
-    }else{
-      throw Exception('Failed to register');
-    }
+      if(statusCode != 200 || json == null){
+        throw Exception('Failed to register');
+      }
+      return Register.fromJson(json.decode(response.body));
+    });
   }
 }

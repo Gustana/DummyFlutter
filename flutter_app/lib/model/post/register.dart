@@ -12,9 +12,12 @@ class Register{
     );
   }
 
-  Map registerToMap(){
+  Map toMap(){
     Map map = new Map<String, dynamic>();
-
+    map['fullName'] = fullName;
+    map['username'] = userName;
+    map['password'] = password;
+    map['level'] = level;
     return map;
   }
 }
