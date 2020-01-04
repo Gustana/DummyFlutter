@@ -9,7 +9,7 @@ class Register{
 
   Register({this.isError, this.message});
   
-  factory Register.doRegister(Map<String, dynamic> data){
+  factory Register._doRegister(Map<String, dynamic> data){
     var registerResponse = data['serverResponse'];
 
     log('$registerResponse');
@@ -45,22 +45,7 @@ class Register{
         throw Exception('Failed to register');
       }
 
-      return Register.doRegister(json.decode(response.body));
+      return Register._doRegister(json.decode(response.body));
     });
-    // var apiResult = await http.post(url, body: registerData);
-
-    // if (apiResult.statusCode != 200 || json == null) {
-    //   throw Exception('Failed to register');
-    // }
-
-    // var registerResponse = json.decode(apiResult.body);
-
-    // log('RegisterResponse : $registerResponse');
-
-    // var register = Register.doRegister(registerResponse);
-
-    // log('$register');
-
-    // return register;
   }
 }

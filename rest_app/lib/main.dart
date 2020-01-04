@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
 
+import 'dart:developer';
+
 import 'package:rest_app/route/mainRoute.dart';
 import 'package:rest_app/model/post/register.dart';
+import 'package:rest_app/model/post/login.dart';
+import 'package:rest_app/helper/sharedPrefHelper.dart';
 
 void main() => runApp(MyApp());
 
@@ -13,34 +17,44 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: MyHomePage(title: 'RestApp'),
+      home: RegisterPage(title: 'RestApp'),
+      initialRoute: '/register',
+      routes: {
+        '/register' : (context) => RegisterPage(title: 'RestApp',),
+        '/login' : (context) => LoginPage(title: 'RestApp')
+      },
     );
   }
 }
 
-class MyHomePage extends StatefulWidget {
+class RegisterPage extends StatefulWidget {
   final String title;
 
-  MyHomePage({Key key, this.title}) : super(key: key);
+  RegisterPage({Key key, this.title}) : super(key: key);
 
   @override
-  _MyHomePageState createState() => _MyHomePageState();
+  _RegisterPageState createState() => _RegisterPageState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
+class _RegisterPageState extends State<RegisterPage> {
 
   static const _registerURL = 'http://10.0.2.2/resto/process/auth/register/register.php';
 
-  var _userNameController = TextEditingController();
-  var _fullNameController = TextEditingController();
-  var _passwordController = TextEditingController();
+  final _userNameController = TextEditingController();
+  final _fullNameController = TextEditingController();
+  final _passwordController = TextEditingController();
 
-  var titleFormStyle = TextStyle(
+  static TextStyle titleFormStyle = TextStyle(
     fontSize: 18,
     color: Colors.blueAccent.shade700,
   );
 
-  void register() async{
+  static TextStyle toLoginTextStyle = TextStyle(
+    fontSize: 16,
+    color: Colors.black
+  );
+
+  void _register() async{
     Map registerData = Register.registerData(
       fullName: _fullNameController.text, 
       userName: _userNameController.text,
@@ -51,15 +65,22 @@ class _MyHomePageState extends State<MyHomePage> {
     Register registerResponse = await Register.register(_registerURL, registerData: registerData);
 
     if (registerResponse.isError == false) {
+
+      SharedPreferencesHelper.insertBoolData(key: SharedPreferencesHelper.isLoggedInKey, value: true);
       moveToHome(context);
     }
 
   }
 
-  void moveToHome(BuildContext context){
+  static void moveToHome(BuildContext context){
     Navigator.pushReplacement(context, MaterialPageRoute(
       builder: (context) => MainRoute()
     ));
+  }
+
+  @override
+  void initState(){
+    super.initState();
   }
 
   @override
@@ -101,7 +122,119 @@ class _MyHomePageState extends State<MyHomePage> {
               child: RaisedButton(
                 child: Text('Register', style: TextStyle(color: Colors.white, fontSize: 20),),
                 color: Colors.amberAccent.shade700,
-                onPressed: register,
+                onPressed: _register,
+              ),
+            ),
+            Container(
+              margin: EdgeInsets.only(top: 16),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: <Widget>[
+                  Text('Sudah punya akun? ', style: toLoginTextStyle,),
+                  Text('login ', style: toLoginTextStyle,),
+                  GestureDetector(
+                    child: Text('disini', style: TextStyle(
+                      fontSize: 16,
+                      color: Colors.amber
+                    )),
+                    onTap: (){
+                      Navigator.pushNamed(context, '/login');
+                    },
+                  ),
+                ],
+              ),
+            )
+          ],
+        )
+      ),
+    );
+  }
+}
+
+class LoginPage extends StatefulWidget{
+  final String title;
+
+  LoginPage({Key key, this.title}) : super(key : key);
+
+  @override
+  State<StatefulWidget> createState() => _LoginPageState();
+}
+
+class _LoginPageState extends State<LoginPage>{
+
+  final _userNameController = TextEditingController();
+  final _passwordController = TextEditingController();
+
+  static const String _loginUrl = 'http://10.0.2.2/resto/process/auth/login/login.php';
+
+  void _login() async{
+    var username = _userNameController.text;
+    log('Login : $username');
+
+    Map loginData = Login.loginData(
+      userName: _userNameController.text,
+      password: _passwordController.text
+    );
+
+    Login loginResponse = await Login.login(_loginUrl, loginData: loginData);
+
+    if (loginResponse.isError == false) {
+      _RegisterPageState.moveToHome(context);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(widget.title),
+      ),
+      body: Container(
+        margin: EdgeInsets.only(top: 16, right: 32, left: 32, bottom: 16),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: <Widget>[
+            Text('UserName', style: _RegisterPageState.titleFormStyle,),
+            Container(
+              margin: EdgeInsets.only(left: 16),
+              child: TextField(
+                controller: _userNameController,
+              ),
+            ),
+            Text('Password', style: _RegisterPageState.titleFormStyle,),
+            Container(
+              margin: EdgeInsets.only(left: 16),
+              child: TextField(
+                obscureText: true,
+                controller: _passwordController,
+              ),
+            ),
+            Container(
+              margin: EdgeInsets.only(left: 8, right: 8, top: 32),
+              child: RaisedButton(
+                child: Text('Login', style: TextStyle(color: Colors.white, fontSize: 20),),
+                color: Colors.amberAccent.shade700,
+                onPressed: _login,
+              ),
+            ),
+            Container(
+              margin: EdgeInsets.only(top: 16),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: <Widget>[
+                  Text('Belum punya akun? ', style: _RegisterPageState.toLoginTextStyle,),
+                  Text('daftar ', style: _RegisterPageState.toLoginTextStyle,),
+                  GestureDetector(
+                    child: Text('disini', style: TextStyle(
+                      fontSize: 16,
+                      color: Colors.amber
+                    )),
+                    onTap: (){
+                      Navigator.pushNamed(context, '/register');
+                    },
+                  ),
+                ],
               ),
             )
           ],
