@@ -1,11 +1,10 @@
-import 'dart:async';
-
+import 'dart:developer';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
+import 'package:flutter/foundation.dart';
 
-import 'package:flutter_app/helper/api_helper.dart';
 import 'package:flutter_app/route/mainRoute.dart';
 import 'package:flutter_app/model/post/register.dart';
+import 'package:logger/logger.dart';
 
 void main() => runApp(MyApp());
 
@@ -34,15 +33,16 @@ class RegisterPage extends StatefulWidget {
 
 class RegisterPageState extends State<RegisterPage>{
 
+  Register _registerResponse;
+  var logger = Logger();
+
   TextEditingController _fullNameController = new TextEditingController();
   TextEditingController _usernameController = new TextEditingController();
   TextEditingController _passwordController = new TextEditingController();
 
-  Future<Register>  _registerUser;
-
   final appName = 'Flutter App';
 
-  static const registerURL = 'http://10.0.2.2/resto/process/auth/register/register.php';
+  static const _registerURL = 'http://10.0.2.2/resto/process/auth/register/register.php';
 
   String _levelUser = 'Select Level';
   static const levelUserData = [
@@ -237,20 +237,23 @@ class RegisterPageState extends State<RegisterPage>{
                           color: Colors.blueAccent,
                           splashColor: Colors.greenAccent,
                           onPressed: () async{
-                            //moveToHome(context);
-                            Register registerData = Register(
-                              fullName: _fullNameController.text, 
-                              userName: _usernameController.text,
-                              password: _passwordController.text,
-                              level: _levelUser
+
+                            Map registerData = Register.registerData(
+                              fullName: '_fullNameController.text', 
+                              userName: '_usernameController.text',
+                              password: '_passwordController.text',
+                              level: "1"
                               );
 
-                            Register register = await ApiHelper.register(
-                              registerURL, 
-                              data: registerData.toMap()
-                            );
+                            Register.register(_registerURL, registerData: registerData).then((onValue){
+                              _registerResponse = onValue;
 
-                            
+                              logger.i("data : $_registerResponse");
+
+                              if(_registerResponse.isError == false){
+                                moveToHome(context);
+                              }
+                            });
                           },
                           child: Container(
                             padding: EdgeInsets.all(12),
@@ -275,7 +278,8 @@ class RegisterPageState extends State<RegisterPage>{
 }
 
 void moveToHome(BuildContext context){
-    Navigator.pushReplacement(context, MaterialPageRoute(
-      builder: (context)=> MainRoute()
-    ));
-  }
+  log('moveTohome');
+  Navigator.pushReplacement(context, MaterialPageRoute(
+    builder: (context)=> MainRoute()
+  ));
+}

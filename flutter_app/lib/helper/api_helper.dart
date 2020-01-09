@@ -8,12 +8,12 @@ class ApiHelper{
   
   static Future<Register> register(String url, {Map data}) async{
     return http.post(url, body: data).then((http.Response response){
-      final statusCode = response.statusCode;
+      final int statusCode = response.statusCode;
 
       if(statusCode != 200 || json == null){
         throw Exception('Failed to register');
       }
-      return Register.fromJson(json.decode(response.body));
+      return Register.doRegister(json.decode(response.body));
     });
   }
 }
