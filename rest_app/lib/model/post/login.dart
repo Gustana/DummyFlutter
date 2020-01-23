@@ -31,6 +31,7 @@ class Login{
 
   static Future<Login> login(String url, {Map loginData}) async{
     return http.post(url, body: loginData).then((http.Response response){
+      log('data kirim : $loginData');
       final int statusCode = response.statusCode;
 
       var responseBody = response.body;

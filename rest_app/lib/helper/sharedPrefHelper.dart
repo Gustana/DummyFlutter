@@ -29,7 +29,7 @@ class SharedPreferencesHelper{
     return _pref.getString(key);
   }
 
-  static getBoolData({String key}) async{
+  getBoolData({String key}) async{
     _pref = await SharedPreferences.getInstance();
 
     return _pref.getBool(key);

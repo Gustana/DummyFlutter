@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'dart:developer';
 
@@ -17,10 +18,9 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: RegisterPage(title: 'RestApp'),
-      initialRoute: '/register',
+      initialRoute: '/',
       routes: {
-        '/register' : (context) => RegisterPage(title: 'RestApp',),
+        '/' : (context) => RegisterPage(title: 'RestApp',),
         '/login' : (context) => LoginPage(title: 'RestApp')
       },
     );
@@ -43,6 +43,10 @@ class _RegisterPageState extends State<RegisterPage> {
   final _userNameController = TextEditingController();
   final _fullNameController = TextEditingController();
   final _passwordController = TextEditingController();
+
+  var isLoggedIn = false;
+
+  SharedPreferencesHelper _sp;
 
   static TextStyle titleFormStyle = TextStyle(
     fontSize: 18,
@@ -73,14 +77,33 @@ class _RegisterPageState extends State<RegisterPage> {
   }
 
   static void moveToHome(BuildContext context){
-    Navigator.pushReplacement(context, MaterialPageRoute(
-      builder: (context) => MainRoute()
-    ));
+    Navigator.push(context, MaterialPageRoute(builder: (context) => MainRoute()));
+  }
+
+  Future<bool> checkSession() async{
+    SharedPreferences sp = await SharedPreferences.getInstance();
+
+    isLoggedIn = sp.getBool(SharedPreferencesHelper.isLoggedInKey);
+
+    log('checkSession : $isLoggedIn');
+
+    return isLoggedIn;
   }
 
   @override
   void initState(){
     super.initState();
+
+    _sp = SharedPreferencesHelper();
+
+    log('initState run');
+
+    checkSession().then((onValue){
+      log('initState : $onValue');
+      if (onValue == true) {
+        moveToHome(context);
+      }
+    });
   }
 
   @override
@@ -168,8 +191,8 @@ class _LoginPageState extends State<LoginPage>{
   static const String _loginUrl = 'http://10.0.2.2/resto/process/auth/login/login.php';
 
   void _login() async{
-    var username = _userNameController.text;
-    log('Login : $username');
+    log('Login : {$_userNameController.text}');
+    log('Login : {$_passwordController.text}');
 
     Map loginData = Login.loginData(
       userName: _userNameController.text,
@@ -231,7 +254,7 @@ class _LoginPageState extends State<LoginPage>{
                       color: Colors.amber
                     )),
                     onTap: (){
-                      Navigator.pushNamed(context, '/register');
+                      Navigator.pushNamed(context, '/');
                     },
                   ),
                 ],
